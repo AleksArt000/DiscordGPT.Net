@@ -1,4 +1,4 @@
-﻿using Discord;
+using Discord;
 using Discord.WebSocket;
 using System;
 using System.Diagnostics;
@@ -39,9 +39,7 @@ namespace BasicBot
             // Subscribing to client events, so that we may receive them whenever they're invoked.
             _client.Log += LogAsync;
             _client.Ready += ReadyAsync;
-            _client.MessageReceived += MessageReceivedAsync;
-            _client.InteractionCreated += InteractionCreatedAsync;
-        }
+            _client.MessageReceived += MessageReceivedAsync;        }
 
         public async Task MainAsync()
         {
@@ -83,13 +81,9 @@ namespace BasicBot
             {
              case "!ping":
                 // code block
-                // Create a new ComponentBuilder, in which dropdowns & buttons can be created.
-                var cb = new ComponentBuilder()
-                .WithButton("Click me!", "unique-id", ButtonStyle.Primary);
 
                 // Send a message with content 'pong', including a button.
-                // This button needs to be build by calling .Build() before being passed into the call.
-                await message.Channel.SendMessageAsync("pong!", components: cb.Build());
+                await message.Channel.SendMessageAsync("pong!");
                 break;
             default:
                 // code block
@@ -113,24 +107,27 @@ namespace BasicBot
                         EnableRaisingEvents = true
                     };
 
-                    process.Start();
-
-                    while (!process.StandardOutput.EndOfStream)
+                    using (message.Channel.EnterTypingState())
                     {
-                        var Data = process.StandardOutput.ReadLine(); 
-                          if( Data != null)
-                          {
-                            messageContent = messageContent + '\n' + Data;
-                          }
-                    }
-                    process.Close();
+                        process.Start();
 
-                    if (messageContent == null)
-                    {
-                        messageContent = "...";
+                        while (!process.StandardOutput.EndOfStream)
+                        {
+                            var Data = process.StandardOutput.ReadLine(); 
+                              if( Data != null)
+                              {
+                                messageContent = messageContent + Data;
+                              }
+                        }
+                        process.Close();
+
+                        if (messageContent == "")
+                        {
+                            messageContent = "...";
+                        }
+                        MessageReference reference = new MessageReference(message.Id);
+                        await message.Channel.SendMessageAsync(messageContent, messageReference:reference);
                     }
-                    MessageReference reference = new MessageReference(message.Id);
-                    await message.Channel.SendMessageAsync(messageContent, messageReference:reference);
                     break;
                 }
                 else
