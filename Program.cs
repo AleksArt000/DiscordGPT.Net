@@ -13,7 +13,6 @@ namespace BasicBot
     {
         System.String token = "token";
         System.String ID = "<@" + "id" + ">";
-        System.String pythonPath = "path-to-python3.11.exe";
 
         // Non-static readonly fields can only be assigned in a constructor.
         // If you want to assign it elsewhere, consider removing the readonly keyword.
@@ -90,14 +89,14 @@ namespace BasicBot
                 if (message.Content.StartsWith(ID))
                 {   
 
-                    System.String path = "/gpt4all-client/client.py";
+                    System.String path = "/client/client.py";
                     System.String messageContent = "";
 
                     var process = new Process
                     {
                         StartInfo = new ProcessStartInfo
                         {
-                            FileName = pythonPath,
+                            FileName = python3,
                             Arguments = path + " " + message.Content,
                             UseShellExecute = false,
                             RedirectStandardOutput = true,
